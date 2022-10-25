@@ -1,0 +1,93 @@
+curl -X 'POST' \
+  'https://fepatest-api.webposonline.com/api/fepa/ak/v1/test/sendFileToProcess/JFXQJIVG/bddc3038-0e64-42a7-ba18-7eaf1c8d1826' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "fiscalDoc": {
+        "companyLicCod": "JFXQJIVG",
+        "apiKey": "bddc3038-0e64-42a7-ba18-7eaf1c8d1826",
+        "branchCod": "0018",
+        "posCod": "001",
+        "docType": "F",
+        "docNumber": "0333",
+        "customerName": "Cliente Gen\u00e9rico",
+        "customerRUC": "",
+        "customerType": "07",
+        "customerAddress": "Santiago Veraguas",
+        "email": "jacenteno@gmail.com",
+        "addInfo": [
+            {
+                "id": 1,
+                "value": "Numero de pedido: 12345"
+            },
+            {
+                "id": 2,
+                "value": "Entrega en sitio"
+            }
+        ],
+        "items": [
+            {
+                "id": 1,
+                "qty": 1.0,
+                "code": "7505031095573",
+                "desc": "KOKO MONOMERO 4 OZ   ",
+                "price": 4.7,
+                "tax": 0,
+                "comments": "precio expresado en unid",
+                "dperc": "00%",
+                "damt": 0
+            },
+            {
+                "id": 2,
+                "qty": 1.0,
+                "code": "7505031092978",
+                "desc": "KOKO BOND 1 Y 2      ",
+                "price": 1.85,
+                "tax": 0,
+                "comments": "precio expresado en unid",
+                "dperc": "00%",
+                "damt": 0
+            },
+            {
+                "id": 3,
+                "qty": 1.0,
+                "code": "034264487949",
+                "desc": "OSTER ACCESORIO CUCH ",
+                "price": 6.99,
+                "tax": 0,
+                "comments": "precio expresado en unid",
+                "dperc": "00%",
+                "damt": 0
+            },
+            {
+                "id": 4,
+                "qty": 1.0,
+                "code": "7505031092985",
+                "desc": "KOKO BOND 1 Y 2 15 M ",
+                "price": 1.99,
+                "tax": 0,
+                "comments": "precio expresado en unid",
+                "dperc": "00%",
+                "damt": 0
+            }
+        ],
+        "discount": {
+            "perc": "0%",
+            "amt": 0
+        },
+        "payments": [
+            {
+                "id": 1,
+                "type": "01",
+                "amt": 16.0,
+                "desc1": "EFECTIVO"
+            }
+        ],  
+        "trailer": [
+            {
+                "id": 1,
+                "value": "Gracias por su Compra"
+            }
+        ]
+    }
+}'

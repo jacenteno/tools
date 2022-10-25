@@ -1,0 +1,63 @@
+{ "fiscalDoc": { 
+"companyLicCod":"JFXQJIVG", 
+"apiKey":"bddc3038-0e64-42a7-ba18-7eaf1c8d1826", 
+"branchCod": "0018",
+"posCod": "001",
+"docType":"F",
+"docNumber": "8201",
+"customerName":"Cliente Genérico",
+"customerRUC":"",
+"customerType": "07",
+"customerAddress":"Santiago Veraguas",
+"email":"jacenteno@gmail.com",
+"addInfo":[
+{"id":1,"value":"Numero de pedido: 12345" },
+{"id":2,"value":"Entrega en sitio" 
+}],
+"items":[
+{ "id":1,"qty":1.0,"code":"7453015087833","desc":"CLOROX AMERICAN BLEA ","price":1.61,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.03},
+{ "id":2,"qty":1.0,"code":"5203791131730","desc":"CAJA DE BRILLO AUREO ","price":0.52,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0},
+{ "id":3,"qty":1.0,"code":"785381014685","desc":"MAGIA BLANCA DESINF. ","price":1.96,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0},
+{ "id":4,"qty":1.0,"code":"7509546654263","desc":"SUAVITEL PRIMAVERAL  ","price":1.83,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.03},
+{ "id":5,"qty":1.0,"code":"736674067048","desc":"JABON TRIO DEVAL SAB ","price":2.83,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.06},
+{ "id":6,"qty":1.0,"code":"7501026000218","desc":"JABON BARRA DAROMA B ","price":0.87,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.02},
+{ "id":7,"qty":1.0,"code":"7702532720359","desc":"LIMP. INODORO  AUTOM ","price":1.11,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.02},
+{ "id":8,"qty":1.0,"code":"018718300213","desc":"LAVAPLATOS SIP CREMA ","price":1.49,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.03},
+{ "id":9,"qty":1.0,"code":"085907110427","desc":"VELA S JOSE BLANCA 5 ","price":1.22,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.03},
+{ "id":10,"qty":1.0,"code":"4008576030120","desc":"LIMA PEDICURA        ","price":1.92,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.04},
+{ "id":11,"qty":3.0,"code":"200012000009","desc":"POLLO LIMPIO X KG    ","price":12.04,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0},
+{ "id":12,"qty":1.0,"code":"202019000006","desc":"HIGADO DE RES X KG   ","price":0.94,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0},
+{ "id":13,"qty":1.0,"code":"200004000000","desc":"PECHUGA DE POLLO JXX ","price":2.37,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0},
+{ "id":14,"qty":1.0,"code":"218256000006","desc":"CHULETA AHUMADA X KG ","price":6.51,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0},
+{ "id":15,"qty":1.0,"code":"7451000810176","desc":"JAMON COCIDO BLUE RI ","price":1.28,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0},
+{ "id":16,"qty":1.0,"code":"743337000465","desc":"JUGO TUTTI FRUTTI MA ","price":0.3,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.01},
+{ "id":17,"qty":1.0,"code":"7451100380043","desc":"FRIJOLES DESAYUNO LU ","price":1.06,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.02},
+{ "id":18,"qty":1.0,"code":"7451001221070","desc":"MOSTAZA LA DONA 200G ","price":0.8,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0},
+{ "id":19,"qty":1.0,"code":"741176250072","desc":"ACEITE PABO 500 ML   ","price":1.78,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0},
+{ "id":20,"qty":1.0,"code":"7451001201508","desc":"ARROCERO LA DO-A 5 1 ","price":0.55,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.01},
+{ "id":21,"qty":1.0,"code":"7451001200198","desc":"OREGANO ENTERO LA DO ","price":0.25,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.01},
+{ "id":22,"qty":1.0,"code":"012157103015","desc":"YOGURT TUTI FRUTI 18 ","price":0.93,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.02},
+{ "id":23,"qty":1.0,"code":"743337000465","desc":"JUGO TUTTI FRUTTI MA ","price":0.3,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.01},
+{ "id":24,"qty":1.0,"code":"7406189003208","desc":"DEPTO","price":1.14,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0.02},
+{ "id":25,"qty":1.0,"code":"099176480846","desc":"CREMA DENTAL COLGATE ","price":2.52,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0},
+{ "id":26,"qty":1.0,"code":"088209731390","desc":"YOGURT MELOCOTON 180 ","price":0.85,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0},
+{ "id":27,"qty":1.0,"code":"7451050770529","desc":"ARROZ ESPECIAL PACHO ","price":3.2,"tax":0,"comments":"precio expresado en unid","dperc":"00%","damt":0}
+ ],
+"discount":{
+   "perc":"0%","amt":0.35
+},
+"payments":[
+{"id":1,"type":"14","amt":53.08,"desc1":"Otros"}],
+"trailer": [
+{"id":1,"value":"NRTARJ:               0000"},
+{"id":2,"value":"MANUAL:                tru"},
+{"id":3,"value":"NROAUT:               0000"},
+{"id":4,"value":"FACTU1:                   "},
+{"id":5,"value":"FACTU2:                   "},
+{"id":6,"value":"NROREG:       1FHS51000056"},
+{"id":7,"value":"LOYDTY:                   "},
+{"id":8,"value":"LOYDNM:                644"},
+{"id":9,"value":"LOYTAR:               1227"},
+{"id":10,"value":"LOYMOD:                 DO"}]
+}
+}

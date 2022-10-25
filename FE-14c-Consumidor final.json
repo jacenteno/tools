@@ -1,0 +1,35 @@
+{ 
+  "fiscalDoc": {
+   "companyLicCod":"JFXQJIVG",
+   "apiKey":"a786855f-a5b7-4821-86a2-2aef86d7d209",
+   "branchCod":"0002",
+   "posCod": "001",
+   "docType":"F",
+   "docNumber":"10001",
+   "customerName":"Cliente Genérico",
+   "customerRUC":"",
+   "customerType": "07",
+   "customerAddress":"",
+   "email":"jcc@webpospanama.com",
+   "addInfo":[
+      {  "id":1,"value":"Numero de pedido: 12345" },
+	  {  "id":2,"value":"Entrega en sitio" }
+    ],
+   "items":[
+	  { "id":1,"qty":10.00,"code":"P001","desc":"Producto ITBMS 7%","price":10.0000,"tax":1,"comments":"La propiedad price es precio unitario","dperc":"10%","damt":0 },
+	  { "id":2,"qty":10.00,"code":"P002","desc":"Producto ITBMS 0% Exento","price":10.0000,"tax":0,"comments":"El descuento se aplica por % o por monto total de descuento son excluyentes","dperc":"0","damt":20.00 },
+	  { "id":3,"qty":10.00,"code":"P003","desc":"Producto ITBMS 10%","price":10.0000,"tax":2,"comments":"10% licores","dperc":"0","damt":0.00 },
+	  { "id":4,"qty":10.00,"code":"P004","desc":"Producto ITBMS 15%","price":10.0000,"tax":3,"comments":"15% cigarrillos","dperc":"0","damt":0.00 }
+    ],
+   "discount":{
+	   "perc":"0%","amt":0
+	},
+   "payments":[
+	   { "id":1,"type":"01","amt":500.00,"desc1":"EFECTIVO" }
+	],
+	"trailer":[
+	   { "id":1,"value":"Información al final" },
+	   { "id":2,"value":"Información al final" }
+	]
+  }
+}

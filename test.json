@@ -1,0 +1,80 @@
+{
+    "fiscalDoc": {
+      "companyLicCod": "string",
+      "branchCod": "string",
+      "posCod": "string",
+      "docType": "string",
+      "docNumber": "string",
+      "customerName": "string",
+      "customerRUC": "string",
+      "customerType": "string",
+      "customerAddress": "string",
+      "email": "user@example.com",
+      "invoiceNumber": "string",
+      "invoiceNumberRefDate": "2022-10-24",
+      "fepa": {
+        "incoterm": "string",
+        "destCountry": "string"
+      },
+      "addInfo": [
+        {
+          "id": 0,
+          "value": "string"
+        }
+      ],
+      "items": [
+        {
+          "id": 0,
+          "qty": 0,
+          "price": 0,
+          "code": "string",
+          "desc": "string",
+          "tax": 0,
+          "comments": "string",
+          "dperc": "string",
+          "damt": 0,
+          "bcode": "string",
+          "auxcode": "string",
+          "cat1Code": "string",
+          "iscType": 0,
+          "iscPerc": "string",
+          "iscValue": 0,
+          "otiS911": 0,
+          "otiPn": 0,
+          "otiIs": 0,
+          "mfDate": "2022-10-24T22:19:08.996Z",
+          "expDate": "2022-10-24T22:19:08.996Z",
+          "lot": "string",
+          "lotQty": 0,
+          "vhModOp": "string",
+          "vhModOpDesc": "string",
+          "vhVin": "string",
+          "vhColorCod": "string",
+          "vhFuel": "string",
+          "vhFuelDesc": "string",
+          "vhMotorNbr": "string",
+          "vhType": 0,
+          "vhUse": 0,
+          "vhModYear": 0,
+          "vhMFYear": 0
+        }
+      ],
+      "discount": {
+        "perc": "string",
+        "amt": 0
+      },
+      "payments": [
+        {
+          "id": 0,
+          "type": "string",
+          "amt": 0
+        }
+      ],
+      "trailer": [
+        {
+          "id": 0,
+          "value": "string"
+        }
+      ]
+    }
+  }
