@@ -5,7 +5,6 @@
 #
 from ast import Break, Global, Try
 from asyncio import current_task
-from asyncio.log import logger
 import mmap
 import base64
 
@@ -17,7 +16,6 @@ from concurrent.futures import thread
 from encodings.utf_8_sig import decode
 import os
 import os.path
-import shutil
 from pickle import FALSE
 import platform
 from socketserver import ThreadingUnixStreamServer
@@ -58,8 +56,6 @@ import qrcode
 from fpdf import FPDF
 from turtle import pd
 
-import xml.etree.ElementTree as ET
-
 global pathLog
 global pathData
 global detalleRuta
@@ -84,7 +80,6 @@ def listas():
     global listReg_H
     global listReg_F 
     global listReg_C 
-    global listReg_B 
     global listReg_W
     global listReg_S
     global listReg_V
@@ -93,10 +88,8 @@ def listas():
     global listReg_K 
     global thislist
     global new_listS
-    global new_listB
     global listReg_c_filtro
     global listItemsJson
-    global listPlu
     thislist =[]
     listReg_F=[]
     listReg_S=[]
@@ -110,12 +103,10 @@ def listas():
     listReg_a=[]
     listReg_j=[]
     listReg_C=[]
-    listReg_B=[] ## referencia a Nota de Credito .
     List_Trn=[]
     new_listS =[]
     listReg_c_filtro=[]
     listItemsJson=[]
-    listPlu=[]
 def SistemaOperativo():
     global pathData
     global pathLog
@@ -127,8 +118,6 @@ def SistemaOperativo():
     global pathJson
     global pathIdcProcesado
     global pathQr
-    global pathFacturaElectronica
-    global pathEntrada
     if queOSystem =='Linux':
         pathData="data//"
         pathLog="logs//"
@@ -139,8 +128,6 @@ def SistemaOperativo():
         pathJson="json//"
         pathIdcProcesado="idcprocesado//"
         pathQr="qr//"
-        pathFacturaElectronica="fe//"
-        pathEntrada="entrada//"
     elif queOSystem =='Darwin':  ## esto es mac
         pathData="data//"
         pathLog="logs//"
@@ -150,8 +137,6 @@ def SistemaOperativo():
         ServerId='MAC Darwin'
         pathIdcProcesado="idcprocesado//"
         pathQr="qr//"
-        pathFacturaElectronica="fe//"
-        pathEntrada="entrada//"
     else:
         pathData="data\\"   #Windows 
         pathLog="logs\\"
@@ -161,8 +146,6 @@ def SistemaOperativo():
         ServerId='Windows'
         pathIdcProcesado="idcprocesado\\"
         pathQr="qr\\"
-        pathFacturaElectronica="fe\\"
-        pathEntrada="entrada\\"
     detalleRuta=pathData+'\n'+pathLog+'\n'+pathleerIDC+pathJournal+'\n'+pathleerIDC+'\n'
     
 def cargarVariableEntorno():
@@ -180,8 +163,6 @@ def cargarVariableEntorno():
     global defaultEmail
     global defaultDireccion
     global LecturaIdc
-    global sucursal
-    global razonSocial
     load_dotenv()
     # Buscando  Variables de Groment.
     token=os.environ.get("api-Token")
@@ -200,10 +181,6 @@ def cargarVariableEntorno():
     defaultEmail=os.environ.get("defaultEmail")
     defaultDireccion=os.environ.get("defaultDireccion")
     LecturaIdc=os.environ.get("LecturaIdc")
-    
-    razonSocial=os.environ.get("razonSocial")
-    sucursal=os.environ.get("sucursal")
-   
     
  
 main_path = os.path.dirname(__file__)
@@ -322,14 +299,7 @@ def buscar(elemento_de_interes, l,code):
         if puntero_ == elemento_de_interes:
             return index
     return -1
-def searchAnulados(listaPlu, patron):
-    for i in range(len(listaPlu)):
-        if listaPlu[i].find(patron) !=-1:  
-           codeValue =listaPlu[i]
-           codeValue =codeValue[-2:]
-           if codeValue=="14" or codeValue=="17" or codeValue=="18":  
-              return True
-    return False
+
 def detalle(elemento_de_interes, list_proces,code):
     new_listS.clear()
     for x in list_proces:
@@ -383,7 +353,6 @@ def procesarTrx(h):
     ListTicketTxt= []            
     secuenc =(h[28:31])
     puntero= tienda+terminal+fecha+transa+"F"
-    puntero_B= tienda+terminal+fecha+transa+"B"
     ## Valores de code1=
          #0 = Money trans. 
          #1 = Sale trans.
@@ -427,12 +396,12 @@ def procesarTrx(h):
     # Escribe en json el tienda:
     #print(encabezadoH)
     listItemsJson.clear
-    if codetrx == "100" or codetrx == "150" or codetrx == "140" or  codetrx == "180" :
-        #logging.info('Procesando solo Transacciones de Ventas:'+codetrx)
-        #logging.info('Hay '+str(hayf)+" Registro F")
+    if codetrx == "100" or codetrx == "150" or codetrx == "160" or  codetrx == "180" :
+        logging.info('Procesando solo Transacciones de Ventas:'+codetrx)
+        logging.info('Hay '+str(hayf)+" Registro F")
        
-        if ( hayf >=0): # Al menos un REGISTRO H TIENE UNA F.
-         #       logging.info('registro F y H = Facturas')
+        if ( hayf >=0):
+                logging.info('registro F y H = Facturas')
                  #Formatos de file de Salida.
                 tipoFileJsonInicio ="FE-14c-"
                 tipoFileTxtIncio ="ARS-POS"
@@ -460,35 +429,7 @@ def procesarTrx(h):
                 else:
                     pass
                 path = r'tools'
-                # buscamos la referencia de Nc.
-                puntero_B= tienda+terminal+fecha+transa+"B"
-                NCRefFactura='0000'
-                hayNotaDeCredito=False  
-                for b in listReg_B:  
-                         
-                        #logging.info(b)
-                        tienda_B  =(b[0:4])
-                        terminal_B=(b[5:8])
-                        fecha_B   =(b[9:15])
-                        hora_B    =(b[17:22])
-                        transa_B  =(b[23:27]) 
-                        code1B   =(b[34:35])
-                        code2B   =(b[35:36])
-                        code3B   =(b[36:37])
-                        puntero_filtroB= tienda_B+terminal_B+fecha_B+transa_B+"B"
-                        #logging.info('Analisando NC')
-                        #logging.info(puntero_filtroB)
-                        #logging.info(puntero_B)
-                        #logging.info('Code3B='+code3B)
-                        #logging.info(b[43:59] )
-                        if puntero_B == puntero_filtroB:
-                            hayNotaDeCredito=True
-                            if code3B=='1':
-                                # logging.info(b[43:59] 
-                                #logging.info('Aqui lo logre:'+b[43:59]  )
-                                NCRefFactura= b[43:59]   
-                                break
-                # Fin de NC
+
                 fileJsonWebPos = open(file_pathJson, "w")
                 fileTickNcrArs = open(file_pathTicket, "w")
                 
@@ -502,25 +443,19 @@ def procesarTrx(h):
                 fileJsonWebPos.write('"branchCod": "'+branch+'",\n')
                 fileJsonWebPos.write('"posCod": "'+poscod+'",\n')
                 
-                if code1 =="1" and code2=="0": # FACTURA Registro H
+                if code1 =="1" and code2=="0":
                         #fileJsonWebPos.write('"docType":"F",\n')
                         fileJsonWebPos.write('"docType":"F",\n')
                         logging.info('doc Type =F Facturas')
-                        hayNotaDeCredit= False
-                        encabezado4="Ref: "+"\n"
                 else:
-                    if code1 =="1" and (code2=="4" ): # NOTA DE CREDITO en registro H
-                        hayNotaDeCredit=True
+                    if code1 =="1" and (code2=="6" or code2=="8"):
                         #fileJsonWebPos.write('"docType":"C",\n')
                         fileJsonWebPos.write('"docType":"C",\n')
-                        fileJsonWebPos.write('"invoiceNumber": "'+NCRefFactura+'",\n')
                         logging.info('Doc Type =C Nocta de Credito')
-                        encabezado4="Trx. Ref#: "+NCRefFactura+"\n"
                 fileJsonWebPos.write('"docNumber": "'+transa+'",\n')
                 fileJsonWebPos.write('"customerName":"Cliente Genérico",\n')
                 fileJsonWebPos.write('"customerRUC":"",\n')
                 ##07 es consumidor final, hay que ver los otros caso.
-                
                 fileJsonWebPos.write('"customerType": "07",\n')
                 fileJsonWebPos.write('"customerAddress":"'+defaultDireccion+'",\n')
                 fileJsonWebPos.write('"email":"'+defaultEmail+'",\n')
@@ -533,16 +468,11 @@ def procesarTrx(h):
                 fileJsonWebPos.write('"items":[\n')
                 encabezadoF =listReg_F[hayf]
                 cajero =encabezadoF[38:42]
-                countItem=int(encabezadoF[63:68])
+                countItem=encabezadoF[62:68]
                 total=encabezadoF[68:79]
-                encabezado1="Tienda:"+tienda+" Pos:"+terminal+" Fecha:"+fecha+" Hora:"+hora+"\n"
-                encabezado2="Doc:"+transa+" Sec:"+secuenc+":"+code1+code2+code3+" :"+" Cajero:"+cajero+'\n'
-                if hayNotaDeCredit:
-                   encabezado3="************ NOTA DE CREDITO ******************\n"
-                else:   
-                   encabezado3="**************** FACTURA *********************\n"
-                fileTickNcrArs.write(razonSocial+"\n")
-                fileTickNcrArs.write(sucursal+"\n")
+                encabezado1="Tienda:"+tienda+" Term:"+terminal+" Fecha:"+fecha+" Hora:"+hora+" Op"+cajero+'\n'
+                encabezado2="Fact:"+transa+" Sec:"+secuenc+"AC:"+code1+code2+code3+" Trx:"+opera+'\n'
+                encabezado3="------------------------------------------------\n"
                 ListTicketTxt.append(encabezado1)
                 fileTickNcrArs.write(encabezado1)
                 
@@ -551,11 +481,11 @@ def procesarTrx(h):
                 
                 fileTickNcrArs.write(encabezado3)
                 ListTicketTxt.append(encabezado3)
-                ListTicketTxt.append(encabezado4)
-                fileTickNcrArs.write(encabezado4)
                 
                 fileTickNcrArs.write("ARTICULOS :"+str((countItem))+'\n')
-                # fileTickNcrArs.write("T O T A L :"+str(float(total)/100)+'\n')
+                ListTicketTxt.append("ARTICULOS :"+str((countItem))+'\n')
+                fileTickNcrArs.write("T O T A L :"+str(float(total)/100)+'\n')
+                ListTicketTxt.append("T O T A L :"+str(float(total)/100)+'\n')
                 
                 puntero= tienda+terminal+fecha+transa+"S"
                 puntero_c= tienda+terminal+fecha+transa+"C"
@@ -566,34 +496,20 @@ def procesarTrx(h):
                 # presento solo pos S de esa transaccion
                 largoListRegS=  len(new_listS)
                 taxcode="G"
-                items=0
-                for idx, ss in enumerate(new_listS):
-                    items=items+1
-                    plu = (ss[44:59])
+                for idx, hh in enumerate(new_listS):
+                    plu = (hh[44:59])
                     pluJson =plu.lstrip()
-                    qty = (ss[60:68])
-                    signo = (ss[59:60])
+                    qty = (hh[60:68])
+                    signo = qty[0:1]
                     qtyI = int((qty[1:4]))
-                    code1S   =(ss[34:35])
-                    code2S   =(ss[35:36])
-                    code3S   =(ss[36:37])
                     if qtyI ==0:
                         qtyI=1
                     deciI=(qty[4:5])
-                    amount=(ss[70:80])
+                    amount=(hh[70:80])
                     #buscamos detalles del registro K para ver si tiene detalles de plu  promo
                     puntero_k= tienda+terminal+fecha+transa+"K"+plu
                     # buscar descripcion en hshPlu
-                    qtyJson= qtyI
-                    amountJson=float(amount)/100
-                    if signo =='+':
-                       fileTickNcrArs.write(""+str(idx+1)+" "+plu+" "+"  "+str(qtyI)+" "+"  "+str(int(amount)/100)+'\n')
-                       #qtyJson= qtyI
-                       #amountJson=float(amount)/100
-                    elif signo =='-':
-                        #qtyJson= (-1*qtyI)
-                        #amountJson=-1*(float(amount)/100)
-                        fileTickNcrArs.write(""+str(idx+1)+" "+plu+" "+signo+' '+str(qtyI)+" "+signo+' '+str(int(amount)/100)+'\n')
+                    fileTickNcrArs.write(""+str(idx+1)+" "+plu+" "+str(qtyI)+" "+str(int(amount)/100)+'\n')
                     ListTicketTxt.append(""+str(idx+1)+" "+plu+" "+str(qtyI)+" "+str(int(amount)/100)+'\n')
                
                     #check(plu)
@@ -601,7 +517,6 @@ def procesarTrx(h):
                     #logging.info('--buscando plu:'+'*'+pluJson+'*')
                     descripcion='DEPTO'
                     tax='0' 
-                    taxcode="."
                     if busqueda:
                         tax =PluMaster[24:25]
                         if tax=="0":
@@ -610,13 +525,15 @@ def procesarTrx(h):
                              taxcode="G"
                         descripcion=PluMaster[36:57]
                         #print(PluMaster[36:57])
-                        fileTickNcrArs.write(descripcion+"  "+'*'+taxcode+'*'+'\n')
+                        fileTickNcrArs.write('['+taxcode+']'+'    '+descripcion+'\n')
+                        ListTicketTxt.append('['+taxcode+']'+'    '+descripcion+'\n')
+               
                     else:
                         fileTickNcrArs.write('DPT-\n')
                     hayDectos=False 
-                    desctok2 ='0' 
-                    
+                    desctok2 ='0'   
                     for k in listReg_K:  
+                        #print(k) 
                         tienda_k  =(k[0:4])
                         terminal_k=(k[5:8])
                         fecha_k   =(k[9:15])
@@ -624,46 +541,19 @@ def procesarTrx(h):
                         transa_k  =(k[23:27]) 
                         plu_k     =(k[44:59])
                         puntero_filtrok= tienda_k+terminal_k+fecha_k+transa_k+"K"+plu_k
+                      
                         if puntero_k == puntero_filtrok: 
+                            
                             desctok= str(int(k[68:79])/100)   
                             desctok2=str(abs(int(k[68:79])/100))
                             fileTickNcrArs.write('              promo:'+desctok+'\n')
                             hayDectos= True
-                            break
-                    # solo la factura or NC para Json...
-                    cadenaJson='{ "id":'+str(items)+',"qty":'+str(qtyJson)+',"code":"'+pluJson+'","desc":"'+descripcion+'","price":'+str(amountJson)+',"tax":'+tax+',"comments":"precio expresado en unid",'+'"dperc":"00%",'+'"damt":'+desctok2+'}\n'  
-                    #print(cadenaJson)
-                    #print(ss)
-                    #print('Valor de code1S'+code1S)
-                    #print('Valor de code2S'+code2S)
-                    #print('Valor de code3S'+code3S)
-                    #print (listPlu)
-                    #valida que este plu no tenga una anulacion o correccion
-                    _patron=tienda+terminal+fecha+transa+plu.lstrip()+'-'
-               
-                    if searchAnulados(listPlu,_patron):
-                       logging.info("Plu Anulado @Tran:"+transa+" sin generar json:"+plu)
+                    #  
+                     #{ "id":1,"qty":10.00,"code":"P001","desc":"Producto ITBMS 7%","price":10.0000,"tax":1,"comments":"La propiedad price es precio unitario","dperc":"10%","damt":0 },                
+                    if (idx+1) == largoListRegS:
+                        fileJsonWebPos.write('{ "id":'+str(idx+1)+',"qty":'+str(float(qtyI))+',"code":"'+pluJson+'","desc":"'+descripcion+'","price":'+str(float(amount)/100)+',"tax":'+tax+',"comments":"precio expresado en unid",'+'"dperc":"00%",'+'"damt":'+desctok2+'}\n')  
                     else:
-                         if code1S=="1" and code2S=="0": # Factura
-                            logging.info("Code1 y Code2 en S:"+code1S+" "+code2S)
-                    
-                            if (idx+1) == largoListRegS:
-                                 # logging.info(cadenaJson)
-                                  fileJsonWebPos.write(cadenaJson)
-                            else:
-                                #logging.info(cadenaJson)
-                                fileJsonWebPos.write(cadenaJson+',\n')
-                                
-                         elif  code1S=="1" and code2S=="6": #Nota Credito
-                                logging.info("Code1 y Code2 en S:"+code1S+" "+code2S)
-                    
-                                if (idx+1) == largoListRegS:
-                                #    logging.info(cadenaJson)
-                                    fileJsonWebPos.write(cadenaJson)
-                                else:
-                                 #   logging.info(cadenaJson)
-                                    fileJsonWebPos.write(cadenaJson+',\n')
-                            
+                         fileJsonWebPos.write('{ "id":'+str(idx+1)+',"qty":'+str(float(qtyI))+',"code":"'+pluJson+'","desc":"'+descripcion+'","price":'+str(float(amount)/100)+',"tax":'+tax+',"comments":"precio expresado en unid",'+'"dperc":"00%",'+'"damt":'+desctok2+'},\n')  
                 fileJsonWebPos.write(' ],\n') 
                 #descuentos
                 fileJsonWebPos.write('"discount":{\n') 
@@ -672,8 +562,6 @@ def procesarTrx(h):
                 listReg_c_filtro.clear
                 anyPromototal= 0
                 totaldescto=0
-                #logging.info('Registro c')  
-                #logging.info(listReg_C) 
                 for c in listReg_C:
                         encabezadoC=c
                         #print(encabezadoC)
@@ -692,13 +580,12 @@ def procesarTrx(h):
                              descto =(float(c[69:78])/100)
                              if acumularDescto=="1":
                                  totaldescto = totaldescto + (float(c[69:78])/100)
-                                 #logging.info('Procesando Descuento acumualdo '+ str(totaldescto))
+                                 logging.info('Procesando Descuento acumualdo '+ str(totaldescto))
                              else:
                                  fileJsonWebPos.write('   "perc":"0%","amt":'+str(round(totaldescto, 2))+'\n')
                              fileTickNcrArs.write("T.Desc:"+dp_detalle+signo+str(descto)+'\n')
                              anyPromototal=1
-                banda="================================================="+'\n'
-                fileTickNcrArs.write(banda)
+                fileTickNcrArs.write("================================================="+'\n')
                 
                 if anyPromototal==0:
                      fileJsonWebPos.write('   "perc":"0%","amt":0\n')
@@ -708,7 +595,7 @@ def procesarTrx(h):
                 fileJsonWebPos.write('},\n'  )    
                 #registros V 
                 fileJsonWebPos.write('"payments":[\n'  )
-                fileTickNcrArs.write("-ITBMS:------->"+'\n')
+                fileTickNcrArs.write("------Impuestos------- "+'\n')
                
                 for v in listReg_V:  
                        
@@ -724,7 +611,7 @@ def procesarTrx(h):
                             idtax_counter = str(int(v[63:68])) 
                             idtax_amount  = str(float(v[70:78])/100)   
                             fileTickNcrArs.write(idtax_detalle+" Art "+idtax_counter+" Tot:"+idtax_amount+'\n')
-                fileTickNcrArs.write(banda)
+                fileTickNcrArs.write("===================================="+'\n')
                 fileTickNcrArs.write("T O T A L: "+str(float(total)/100)+'\n')
                 ContadorPagos =0
                 listPagos = []
@@ -756,14 +643,14 @@ def procesarTrx(h):
                                 descripPago="EFECTIVO"
                             elif idpago=="02":
                                 descripPago="TARJ.CREDITO"
-                            #   fileTickNcrArs.write("-"+descripPago+" "+idpago+" "+idpagoCounter+" Monto "+idpagoAmount+'\n')
+                                
                             if idpagosigno =="+":
-                                    fileTickNcrArs.write("-"+descripPago+"     "+" Monto "+idpagoAmount+'\n')
+                                    fileTickNcrArs.write("--- PAGO   "+idpago+" "+idpagoCounter+" Monto "+idpagoAmount+'\n')
                                     ContadorPagos +=1
                                     listPagos.append('{"id":'+str(ContadorPagos)+',"type":"'+idpago+'","amt":'+idpagoAmount+',"desc1":"'+descripPago+'"},\n ')
                             elif idpagosigno =="-":
                                  idpagoAmount = idpagoAmount  
-                                 fileTickNcrArs.write("-VUELTO"+"       "+" Monto "+idpagoAmount+'\n')
+                                 fileTickNcrArs.write("--- CAMBIO "+idpago+' '+idpagoCounter+" Monto "+idpagoAmount+'\n')
                 # Quita a ultima comas de pagos si hay
                 #for t in listPagos:
                 #    print(t)
@@ -826,7 +713,7 @@ def procesarTrx(h):
                 #Genera un Pdf de ticket procesado.
                 title = encabezado1
                 pdf = FPDF()
-                pdf.set_title("--")
+                pdf.set_title("QR Codes")
                 pdf.add_page()
                 pdf.alias_nb_pages()
                 
@@ -866,7 +753,7 @@ def procesarTrx(h):
                     pdf.set_font('courier', '', 10.0)
                     for i in file:
                         pdf.set_line_width(0.0)
-                        pdf.cell(130,10,txt=i,ln =0.5,align="L")
+                        pdf.cell(130,10,txt=i,ln =1,align="C")
                 
                 pdf.output(file_pathTicketPdf)
                 PyPDF4.PdfFileReader(file_pathTicketPdf)
@@ -879,10 +766,10 @@ def procesarTrx(h):
                 else:
                     pass
                 print(Fore.LIGHTRED_EX+'Ti'+Fore.LIGHTCYAN_EX+'ck'+Fore.YELLOW+'et:'+Fore.LIGHTWHITE_EX+transa) 
-                #logging.info('Tran #:'+transa+' procesada')
+                logging.info('Tran #:'+transa+' procesada')
                 if mostrar_Pdf=='1':           
                     webbrowser.open(r'file:///'+os.path.abspath(file_pathTicketPdfFirma)) 
-                if verFileJson=='90':
+                if verFileJson=='1':
                     # Opening JSON file
                      # create a temporary file and write some data to it
                     fp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
@@ -895,23 +782,27 @@ def procesarTrx(h):
                     #print(json.dumps(data, indent=4, sort_keys=False))
                     bonito= json.dumps(data)      
                     fp.write(json.dumps(data))
+                    #  
+                    logging.critical("\n"+bonito)
                     file_nametmp = fp.name
                     #
                     shutil.copy(file_pathJson, 'beautyJson.json')
                     os.remove(file_pathJson)
                     #shutil.copy('beautyJson.json', file_pathJson)
                     shutil.copy('beautyJson.json', file_pathJson)
+                   
                     os.remove(file_nametmp)
+                    
                     #for i in data['fiscalDoc']:
                         #pass
                     #  logging.critical(i)
                     # Fin de enviojason
                 # enviar al Api.
                 fileDiccionario= file_pathJson
-                #logging.critical('Diccionario de ARS '+ fileDiccionario)
+                logging.critical('Diccionario de ARS '+ fileDiccionario)
                 #url_Pac_Proveedor provee los de Webpos por ahora
                 rutaWebPos=url_Pac_Proveedor #+fileDiccionario
-                logging.critical('API: \n'+rutaWebPos)
+                logging.critical('Llamado al API \n'+rutaWebPos)
                 x = requests.post(rutaWebPos)
                 try:
                         with open(fileDiccionario, "rb") as a_file:
@@ -921,10 +812,10 @@ def procesarTrx(h):
                             response = requests.post(rutaWebPos, data=json.dumps(json_data), headers=headers)
                         if response:
                                 logging.warning('n\'+Conexion al API = OK')
-                                #logging.warning(response.status_code)
+                                logging.warning(response.status_code)
                                 respuesta =response.json()
                                 json_formatted_str = json.dumps(respuesta)
-                                #logging.warning('\n'+json_formatted_str)
+                                logging.warning('\n'+json_formatted_str)
                                 dgiResp=respuesta.get('dgiResp')
                                 qrContent=respuesta.get('qrContent')
                                 qrB64=respuesta.get('qrB64')
@@ -937,32 +828,15 @@ def procesarTrx(h):
                                 docDate=respuesta.get('docDate')
                                 dateSentToDgi=respuesta.get('dateSentToDgi')
                                 confirmationNbr=respuesta.get('confirmationNbr')
-                                xmlFeSigned=respuesta.get('xmlFeSigned')
+                                authNumber=respuesta.get('authNumber')
                                 QrFactCufe=str(cufe)+'.png'
                                 qRFile=os.path.join(main_path,pathQr+QrFactCufe)
                                 image_64_decode = base64.b64decode(qrB64) 
                                 image_result = open(qRFile, 'wb') # create a writable image and write the decoding result
                                 image_result.write(image_64_decode)
-                                logging.info('creado factura con QR de DGI')
                                 creaPdfDgi(qRFile,cufe,systemRef,authNumber,secNumber,
                                            feNumber,authDate,
                                            confirmationNbr,docDate,dateSentToDgi)
-                                logging.info(xmlFeSigned)
-                                #myroot = ET.fromstring(xmlFeSigned)
-                               
-                                logging.info("Analizando XML")
-                                myroot2=ET.fromstring(xmlFeSigned)
-                                myroot2=BeautifulSoup(data)
-                                for child in myroot2.iter('*'):
-                                    logging.info(child.tag)
-                                    #print(child.attributes['dDescProd'].value)
-                                
-                 
-                                for elem in myroot2:
-                                    for subelem in elem:
-                                        #print(subelem.text)
-                                        logging.info(subelem.text)
-         
                         else:
                                 logging.error('Falla de Respuesta del API ')
                                 logging.error(response.status_code)
@@ -981,11 +855,9 @@ def creaPdfDgi(qRFile,cufe,systemRef,authNumber,secNumber,feNumber,authDate,conf
     pdf.set_font('helvetica', '', 11.0)
     pdf.image(qRFile, 120.0, 19.0, link='', type='', w=90.0, h=90.0)
     
-    pdf.set_xy(65.0, 2.0)
-    pdf.set_font('arial', 'B', 10.0)
-    pdf.cell(ln=0, h=22.0, align='C', w=75.0, txt='CÓDIGO ÚNICO DE FACTURA ELECTRÓNICA [CUFE]', border=0)
-    pdf.set_xy(65.0, 7.0)
-    pdf.cell(ln=0, h=22.0, align='C', w=75.0, txt=''+cufe, border=0)
+    pdf.set_xy(65.0, 6.0)
+    pdf.set_font('arial', 'B', 11.0)
+    pdf.cell(ln=0, h=22.0, align='C', w=75.0, txt='CUFE:'+cufe, border=0)
     
     pdf.set_font('arial', '', 10.0)
     pdf.set_xy(20.0, 11)
@@ -1021,45 +893,57 @@ def creaPdfDgi(qRFile,cufe,systemRef,authNumber,secNumber,feNumber,authDate,conf
         pdf.set_font('courier', '', 10.0)
         for i in file:
             pdf.set_line_width(0.0)
-            pdf.cell(100,10,txt=i,ln =0.5,align="L")
-    facturafinalDgi=cufe+'.PDF'
-    FeFile=os.path.join(main_path,pathFacturaElectronica+facturafinalDgi)          
-    #qRFile=os.path.join(main_path,pathQr+QrFactCufe)
-    logging.critical(pathFacturaElectronica) 
-    logging.critical(FeFile)     
-    pdf.output(FeFile)
-    PyPDF4.PdfFileReader(FeFile)
+            pdf.cell(100,10,txt=i,ln =0.5,align="C")
+                
+                
+    pdf.output('demo.pdf')
+    PyPDF4.PdfFileReader('demo.pdf')
+                
+                            
+def unaFactura():
+    logging.info('Transaccion #:'+' Compleatada')
+    if mostrar_Pdf=='1':           
+       webbrowser.open(r'file:///'+os.path.abspath(file_pathTicketPdfFirma)) 
+    if verFileJson=='1':
+        # Opening JSON file
+        # create a temporary file and write some data to it
+        fp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
+        fjson = open(file_pathJson)
+        # returns JSON object as 
+        # a dictionary
+        data = json.load(fjson)
+        fjson.close()
+        # Iterating through the json
+        #print(json.dumps(data, indent=4, sort_keys=False))       
+        fp.write(json.dumps(data, indent=4, sort_keys=False))
+        logging.critical(json.dumps(data, indent=4, sort_keys=False))       
+        logging.info('Se puso el json Bonito tabulado')
+        #  
+        file_nametmp = fp.name
+        #
+        shutil.copy(file_pathJson, 'beautyJson.json')
+        os.remove(file_pathJson)
+        shutil.copy('beautyJson.json', file_pathJson)
+        logging.info('copiando beautyJson.json a ' +file_pathJson)
+        os.remove(file_nametmp)
+        logging.info('borrando temporal'+file_nametmp)
+        for i in data['fiscalDoc']:
+            logging.critical(i)
 def is_s3_path(path):
     return path.startswith("s3:/")
-
+line =''
 def addRegistroIDC(line):
     # Solo se filtra el registro tipo "H" Ventas
     #print(line)
     valor =0
-    
-    if line.find(":H:") !=-1:
+    if line.find(":H:") != -1:
         listReg_H.append(line)
         valor =1
-       # logging.info(listReg_H)
-    elif line.find(":W:")!=-1:
+    elif line.find(":W:")!= -1:
         listReg_W.append(line)
         valor =2
-    elif line.find(":S:") !=-1:     
+    elif line.find(":S:") != -1:     
         listReg_S.append(line)
-        
-        store_=line[0:4]
-        pos_=line[5:8]
-        fech_=line[9:15]
-        trx_=line[23:27]
-        codetrx_=line[34:36]
-        s_=line[32:33]
-        value_=line[43:60]
-        validar=store_+pos_+fech_+trx_+value_.lstrip()+s_+codetrx_
-        #          1         2         3         4         5         6         7         8
-        #012345678901234567890123456789012345678901234567890123456789012345678901234567890
-        #0202:004:221026:113151:7549:007:S:141:0001:   7613287668738-00010010*000000037
-        listPlu.append(validar)
-       
         valor =3
     elif line.find(":V:") !=-1:
         listReg_V.append(line)
@@ -1071,21 +955,14 @@ def addRegistroIDC(line):
         listReg_F.append(line)
         valor =6
     elif  line.find(":K:") !=-1:
-          #busca 
-          Mycadena= line
-          #0202:004:221026:113419:7550:019:K:100:0000:    216030000006:0100000:+000000000
-          if Mycadena.find(":K:100:0000:") !=-1:
-            listReg_K.append(line)
-            valor =7
+        listReg_K.append(line)
+        valor =7
     elif  line.find(":U:") !=-1:
             listReg_U.append(line)
             valor =8
     elif  line.find(":C:") !=-1:
            listReg_C.append(line)
            valor =9   
-    elif  line.find(":B:") !=-1:
-           listReg_B.append(line)
-           valor =10         
     thislist.append(line) 
    
 # Proceso de lectura de File IDC
@@ -1097,37 +974,29 @@ def cargaInicial():
     global  file_idc
     global  fileIdcExiste
     global  numeroRow
-    
-    listas()
+    #Limpia los lista []
     fileIdcAprocesar =LecturaIdc #"S_IDC001.DAT" 
     fileprocess =fileIdcAprocesar         #"S_IDC001.DAT" 
-    #logging.critical('Esperando File NCR: '+fileIdcAprocesar+" para enviar PAC(webPos)")
+    logging.critical('wait for:'+fileIdcAprocesar+" para enviar WebPos")
     
     numeroRow =0
     try:
         file_idc = os.path.join(main_path,pathleerIDC+fileprocess )
         fileIdcExiste = os.path.exists(file_idc)
         #logging.error('Ok existe el file IDC:'+file_idc)
-        line =''
         if fileIdcExiste: 
-             numeroRow =0
              with open(file_idc, encoding='utf8') as Lectura:
-                
+                numeroRow =0
                 while True:
-                    numeroRow +=1
                     line = Lectura.readline()
-                    #logging.critical('Registro:'+str(numeroRow))
-                    #logging.critical(line)
-                    #logging.critical(line.find(':H:'))
                     addRegistroIDC(line)
-              
+                    numeroRow +=1 
                     if not line:
-                         break
-              
+                       break
                 thislist.sort()
                 logging.error('Valor de numeroRow:'+str(numeroRow))
-                #logging.debug('file extraido para procesar:'+file_idc)
-                
+                logging.debug('file extraido para procesar:'+file_idc)
+     
     except ValueError:
         #print()
         logging.error("Oops! no ha llegado el file"+fileprocess)
@@ -1155,7 +1024,6 @@ def main():
     rueda=0
     while True:
         try:
-            
             rueda += 1
             t1 =threading.Thread(target=background_ProcesarIDC)
             t1.start()
@@ -1175,10 +1043,8 @@ def moveridcprocesado():
         fileIdcLeido  = fileIdcAprocesar+'_'+datetime.datetime.now().strftime('%m_%d_%Y_%H_%M_%S') 
         logging.info('moviendo '+ file_idc +' a '+fileIdcLeido)
         shutil.copy(file_idc,pathIdcProcesado+fileIdcLeido)
-        fileIdcProcesado  = fileIdcAprocesar+'.procesado'
-        shutil.copy(file_idc, pathEntrada+fileIdcProcesado)
         os.remove(file_idc)
-        logging.info('moviendo  '+ file_idc )
+        logging.info('borrando '+ file_idc )
                     
 def background_ProcesarIDC():
     global encabezadoH   
@@ -1187,19 +1053,18 @@ def background_ProcesarIDC():
     global fecha
     global hora  
     global transa  
-    #listas()
+    listas()
     cargaInicial() 
+    logging.info('# de Registros del File Recibido: '+str(numeroRow))
     if numeroRow >0:
-        logging.info('# de Registros del File Recibido: '+str(numeroRow))
         puntero =''
         transa=''
         listReg_H.sort()
         totalH=len(listReg_H)
         #logging.info(listReg_H)
-        #logging.info(totalH)
-        if (totalH>0):
+        logging.info(totalH)
+        if (len(listReg_H)>0):
             for h in tqdm (listReg_H,desc=Fore.LIGHTYELLOW_EX+"Read "+Fore.WHITE+str(totalH)+Fore.LIGHTGREEN_EX+transa,ascii=False, ncols=100):
-                #logging.info('--Procesando '+h+'\n')
                 time.sleep(0.01)
                 encabezadoH= h
                 tienda  =(h[0:4])
@@ -1208,8 +1073,9 @@ def background_ProcesarIDC():
                 hora    =(h[17:22])
                 transa  =(h[23:27])
                 procesarTrx(h)
-        #borra el archivo procesados...      
-        moveridcprocesado()
+            moveridcprocesado()
+    #
+       
     #Fin de lectura
 # Modulo Principal de Lectura   
 if __name__ == "__main__":
